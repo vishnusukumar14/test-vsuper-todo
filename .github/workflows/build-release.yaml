@@ -12,7 +12,7 @@ on:
 #        - dev
 #        - prod
 
-job:
+jobs:
   build:
     name: Build-Release
     runs-on: macos-latest
