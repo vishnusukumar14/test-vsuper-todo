@@ -56,5 +56,27 @@ jobs:
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.TOKEN }}
 
+      # iOS Build (Optional)
+      - name: Build iOS (no code signing)
+        run: flutter build ios --no-codesign
+        continue-on-error: true
 
+      - name: Package iOS .ipa
+        run: |
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -r Runner.app Payload/
+          zip -r app.ipa Payload
+        continue-on-error: true
 
+      - name: Upload iOS IPA Artifact to GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: build/ios/iphoneos/app.ipa
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.TOKEN }}
+        continue-on-error: true
+
+      - name: Warn if iOS build failed
+        if: failure()
+        run: echo "::warning ::iOS build failed, continuing with Android release."
